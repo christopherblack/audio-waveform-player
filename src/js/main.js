@@ -1,7 +1,14 @@
 const app = document.getElementById('app')
 const apbgp = document.getElementById('app_bg')
 const path = document.getElementById('path')
+const polygon = document.getElementById('polygon')
+const circular = document.getElementById('circular')
 const width = 1000
+const fftSize = 13
+const minfftSize = 5
+const maxfftSize = 15
+const cutoff = .80
+
 let player = document.createElement('audio')
 let context
 let analyser
@@ -32,7 +39,8 @@ function init() {
     const media = context.createMediaElementSource(player)
     media.connect(analyser)
     analyser.connect(context.destination)
-    analyser.fftSize = 2048
+    analyser.fftSize = Math.pow(2, fftSize < 15 ? (fftSize < 5 ? minfftSize : fftSize) : maxfftSize)
+    // analyser.minDecibels = -150
 
     let bufferLength = analyser.frequencyBinCount;
     dataArray = new Uint8Array(bufferLength)
@@ -43,43 +51,72 @@ function renderAnimation() {
     requestAnimationFrame(renderAnimation);
     analyser.getByteFrequencyData(dataArray)
 
-    generatePath(path, width, dataArray, 800)
+    // to Generate linear waveform
+    generatePath(path, width, dataArray)
 
-    // let avg = dataArray.reduce((a, b) => a + b)/dataArray.length
-    // // app.style.borderWidth = avg + 'px'
-    // // app.style.boxShadow = `red 0 0 ${avg}px ${avg/4}px`
-    // avg = avg === 0 ? 1 : avg
-    // apbgp.style.transform = `scale(${1 + avg/800})`
+    // to generate polygon waveform
+    generatePolygon(polygon, 450, 150, dataArray, 0)
 
-
+    // to generate polygon waveform
+    generateCircular(circular, 150, 150, dataArray, 0)
 }
 
-function generatePath(path, pathLength, arr, lengthOverride = null) {
-    // let arr = generateRandomArr(length)
-    const length = lengthOverride || arr.length
-    let step = pathLength / length || 1
-    // //
-    // let realLength = 0
-    //
-    // for (let i = 0; i < length; i++) {
-    //     if (arr[i]) {
-    //         realLength++
-    //     }
-    // }
-
-    // step = Number.parseInt(pathLength / length)
-
-    let str = `M0 0 L 0 ${arr[0]}, ${step} ${arr[1]} `
-    let offset = 0
-    for (let i = 2; i < length; i++) {
+function generatePolygon(polygon, x, y, arr) {
+    const length = arr.length * cutoff
+    const deg = 360 / length
+    const offset = 3
+    let str = ''
+    for (let i = 0; i < length; i++) {
         if (arr[i]) {
-            str += `L ${ step * (i - offset)} ${arr[i]} `
+            let x1 = Math.sin(deg * i) * arr[i] / offset + x
+            let y1 = Math.cos(deg * i) * arr[i] / offset + y
+            str += `${x1},${y1} `
+        }
+        // else {
+        //     str += `L ${ step * (i - offset)} 1 `
+        // }
+    }
+
+
+    polygon.setAttribute('points', str)
+}
+
+function generateCircular(path, x, y, arr) {
+    const length = arr.length
+    const deg = 360 / length
+    const offset = 3
+    let str = `M${x} ${y} `
+    for (let i = 1; i < length; i++) {
+        if (arr[i]) {
+            let x1 = Math.sin(deg * i) * arr[i] / offset + x
+            let y1 = Math.cos(deg * i) * arr[i] / offset + y
+            // str += `${x1},${y1} `
+            str += `L ${x1} ${y1} L ${x} ${y} `
+        }
+        // else {
+        //     str += `L ${ step * (i - offset)} 1 `
+        // }
+    }
+
+    path.setAttribute('d', str)
+}
+
+function generatePath(path, pathLength, arr) {
+    // let arr = generateRandomArr(length)
+    const length = arr.length
+    let step = pathLength / length || 1
+
+    let str = `M0 0 `
+
+    for (let i = 0; i < length; i++) {
+        if (arr[i]) {
+            str += `L ${ step * i} ${arr[i]} `
         } else {
-            str += `L ${ step * (i - offset)} 1 `
+            str += `L ${ step * i} 1 `
         }
     }
-    str += `L ${step * (length + 1 - offset)} 0`
-        path.setAttribute('d', str)
+    str += `L ${step * (length + 1)} 0`
+    path.setAttribute('d', str)
 }
 
 function generateRandomArr(length, min = 0, max = 255) {
@@ -97,20 +134,3 @@ function getRandomInt(min, max) {
 }
 
 app.addEventListener('click', () => {player.paused ? (inited ? player.play() : inited = init(), player.play()) : player.pause(), renderAnimation()})
-
-// function loadSound(url, onload) {
-//     const request = new XMLHttpRequest();
-//     request.open('GET', url, true);
-//     request.responseType = 'arraybuffer';
-//
-//     request.onload = () => onload(request.response)
-//     request.send();
-// }
-//
-// function playSound(buffer) {
-//     let source = context.createBufferSource(); // creates a sound source
-//     source.buffer = buffer;                    // tell the source which sound to play
-//     source.connect(context.destination);       // connect the source to the context's destination (the speakers)
-//     source.start(0);                           // play the source now
-//     // note: on older systems, may have to use deprecated noteOn(time);
-// }
