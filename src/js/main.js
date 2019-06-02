@@ -3,8 +3,10 @@ const apbgp = document.getElementById('app_bg')
 const path = document.getElementById('path')
 const polygon = document.getElementById('polygon')
 const circular = document.getElementById('circular')
+const canvas = document.getElementById('canvas').getContext('2d')
 const width = 1000
-const fftSize = 13
+const height = 300
+const fftSize = 12
 const minfftSize = 5
 const maxfftSize = 15
 const cutoff = .80
@@ -55,10 +57,67 @@ function renderAnimation() {
     generatePath(path, width, dataArray)
 
     // to generate polygon waveform
-    generatePolygon(polygon, 450, 150, dataArray, 0)
+    // generatePolygon(polygon, 450, 150, dataArray, 0)
 
     // to generate polygon waveform
-    generateCircular(circular, 150, 150, dataArray, 0)
+    // generateCircular(circular, 150, 150, dataArray, 0)
+
+    // to generate canvas circular
+    // generateCanvasCircular(canvas, 150, 150, dataArray)
+
+    // to Generate canvas linear waveform
+    generateCanvasPath(canvas, width, dataArray)
+}
+
+function generateCanvasCircular(ctx, x, y, arr) {
+    const length = arr.length
+    const deg = 360 / length
+    const offset = 3
+
+    ctx.clearRect(0,0,1000,300) // clear canvas
+
+    ctx.fillStyle = '#000000'
+    ctx.strokeStyle = '#000000'
+    ctx.save()
+
+    ctx.beginPath()
+    ctx.moveTo(x, y)
+
+    for (let i = 0; i < length; i++) {
+        if (arr[i]) {
+            let x1 = Math.sin(deg * i) * arr[i] / offset + x
+            let y1 = Math.cos(deg * i) * arr[i] / offset + y
+            // str += `${x1},${y1} `
+            ctx.lineTo(x1, y1)
+            ctx.lineTo(x, y)
+        }
+    }
+        ctx.stroke()
+}
+
+function generateCanvasPath(ctx, pathLength, arr) {
+    const length = arr.length
+    let step = pathLength / length || 1
+
+    ctx.clearRect(0,0,width,height) // clear canvas
+
+    ctx.fillStyle = '#000000'
+    ctx.strokeStyle = '#000000'
+    ctx.save()
+
+    ctx.beginPath()
+    ctx.moveTo(0, height)
+
+    for (let i = 0; i < length; i++) {
+        if (arr[i]) {
+            // step * ( i - 1 ) + step / 2 (to make /\ lines)
+            ctx.lineTo(step * i , height - arr[i])
+        } else {
+            ctx.lineTo(step * i, height - 1)
+        }
+        // ctx.lineTo(step * i, height)
+    }
+    ctx.fill()
 }
 
 function generatePolygon(polygon, x, y, arr) {
@@ -110,9 +169,9 @@ function generatePath(path, pathLength, arr) {
 
     for (let i = 0; i < length; i++) {
         if (arr[i]) {
-            str += `L ${ step * i} ${arr[i]} `
+            str += `L ${ step * ( i - 1 ) + step / 2 } ${arr[i]} `
         } else {
-            str += `L ${ step * i} 1 `
+            str += `L ${ step * ( i - 1 ) + step / 2 } 1 `
         }
     }
     str += `L ${step * (length + 1)} 0`
