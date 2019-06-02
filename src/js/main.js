@@ -29,11 +29,6 @@ document.body.appendChild(player)
 window.player = player
 
 
-
-// renderAnimation()
-
-window.generatePath = generatePath
-
 function init() {
     context = new (window.AudioContext || window.webkitAudioContext)()
     analyser = context.createAnalyser()
