@@ -23,8 +23,8 @@ class WaveformAudioPlayer {
         this.player = new AudioCreator(window, this.wrapper, audio, width, height)
         this.wfAnimator = new WaveformAnimator(window, this.player.createPlayer(), quality, this.canvas.draw.bind(this.canvas))
         this.player.connect(() => {
-            this.wfAnimator.updateContext.bind(this.wfAnimator)()
-            this.wfAnimator.renderAnimation.bind(this.wfAnimator)()
+            this.wfAnimator.updateContext.call(this.wfAnimator)
+            this.wfAnimator.renderAnimation.call(this.wfAnimator)
         })
     }
 }

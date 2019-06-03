@@ -21,6 +21,11 @@ class AudioCreator {
     createPlayButton() {
         let playButton = this.context.document.createElement('div')
         playButton.className = 'player-button'
+        playButton.style.setProperty('width', this.width / 4 + 'px')
+        playButton.style.setProperty('height', this.height / 4 + 'px')
+        playButton.style.setProperty('top', this.height / 2 - this.height / 8 + 'px')
+        playButton.style.setProperty('left', this.width / 2 - this.width / 8 + 'px')
+
         this.container.classList.add('paused')
         playButton.addEventListener('click', (e) => {
             if (this.player.paused) {

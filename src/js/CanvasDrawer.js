@@ -75,9 +75,9 @@ class CanvasDrawer {
     drawCircular(arr) {
         const length = arr.length
         const deg = 360 / length
-        const offset = 3
+        const offset = 256 / this._WIDTH * 2
 
-        this.ctx.clearRect(0,0,1000,300) // clear canvas
+        this.ctx.clearRect(0,0,this._WIDTH,this._HEIGHT) // clear canvas
 
         this.ctx.fillStyle = this._FILL || '#000000'
         this.ctx.strokeStyle = this._STROKE || '#000000'
