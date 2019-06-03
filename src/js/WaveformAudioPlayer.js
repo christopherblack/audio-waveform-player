@@ -1,6 +1,10 @@
+import CanvasDrawer from './CanvasDrawer'
+import AudioCreator from './AudioCreator'
+import WaveformAnimator from './WaveformAnimator'
+
 class WaveformAudioPlayer {
-    constructor({document}, {container}, {audio}, {width}, {height}, {type}, {stroke}, {fill}, {background}) {
-        this._context = document
+    constructor({window, container, audio, width, height, type, stroke, fill, background, quality}) {
+        this._context = window
         this._container = container
         this._audio = audio
         this._WIDTH = width
@@ -10,6 +14,19 @@ class WaveformAudioPlayer {
         this._STROKE = stroke
         this._BACKGROUND = background
 
-        this.player = new AudioCreator(document, container, audio, width, height)
+
+        this.wrapper = window.document.createElement('div')
+        this.wrapper.className = 'waplayer'
+        container.appendChild(this.wrapper)
+
+        this.canvas = new CanvasDrawer(window, this.wrapper, width, height, type, stroke, fill)
+        this.player = new AudioCreator(window, this.wrapper, audio, width, height)
+        this.wfAnimator = new WaveformAnimator(window, this.player.createPlayer(), quality, this.canvas.draw.bind(this.canvas))
+        this.player.connect(() => {
+            this.wfAnimator.updateContext.bind(this.wfAnimator)()
+            this.wfAnimator.renderAnimation.bind(this.wfAnimator)()
+        })
     }
 }
+
+export default WaveformAudioPlayer

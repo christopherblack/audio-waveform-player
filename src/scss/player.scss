@@ -1,0 +1,20 @@
+.waplayer {
+  .player-button {
+    width: 100px;
+    height: 100px;
+    display: block;
+    position: absolute;
+    cursor: pointer;
+    background-size: contain;
+  }
+  &.paused {
+    .player-button {
+      background-image: url('../assets/play.svg');
+    }
+  }
+  &.playing {
+    .player-button {
+      background-image: url('../assets/pause.svg');
+    }
+  }
+}

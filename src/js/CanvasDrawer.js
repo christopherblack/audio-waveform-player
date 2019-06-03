@@ -1,6 +1,6 @@
 class CanvasDrawer {
-    constructor({document}, {container}, {width}, {height}, {type}, {stroke}, {fill}) {
-        this._context = document
+    constructor(window, container, width, height, type, stroke, fill) {
+        this._context = window
         this._container = container
         this._WIDTH = width
         this._HEIGHT = height
@@ -12,15 +12,18 @@ class CanvasDrawer {
         this.canvas = null
         this.ctx = null
         this.drawFunction = this.setDrawFunction(type)
-
         this.createCanvas()
     }
 
     setDrawFunction(type) {
         switch (type) {
             case 'linear':
+                this._X = 0
+                this._Y = 0
                 return this.drawLinear
             case 'circular':
+                this._X = this._WIDTH / 2
+                this._Y = this._HEIGHT / 2
                 return this.drawCircular
             case 'polygon':
                 return this.drawPolygon
@@ -28,7 +31,7 @@ class CanvasDrawer {
     }
 
     createCanvas() {
-        this.canvas = this._context.createElement('canvas')
+        this.canvas = this._context.document.createElement('canvas')
         this.canvas.width = this._WIDTH
         this.canvas.height = this._HEIGHT
         this.ctx = this.canvas.getContext('2d')
@@ -43,7 +46,7 @@ class CanvasDrawer {
         const length = arr.length
         let step = this._WIDTH / length || 1
 
-        this.ctx.clearRect(0,0,width,height) // clear canvas
+        this.ctx.clearRect(0,0, this._WIDTH, this._HEIGHT) // clear canvas
 
         this.ctx.fillStyle = this._FILL || '#000000'
         this.ctx.strokeStyle = this._STROKE || '#000000'
@@ -69,4 +72,32 @@ class CanvasDrawer {
             this.ctx.fill()
     }
 
+    drawCircular(arr) {
+        const length = arr.length
+        const deg = 360 / length
+        const offset = 3
+
+        this.ctx.clearRect(0,0,1000,300) // clear canvas
+
+        this.ctx.fillStyle = this._FILL || '#000000'
+        this.ctx.strokeStyle = this._STROKE || '#000000'
+        this.ctx.save()
+
+        this.ctx.beginPath()
+        this.ctx.moveTo(this._X, this._Y)
+
+        for (let i = 0; i < length; i++) {
+            if (arr[i]) {
+                let x1 = Math.sin(deg * i) * arr[i] / offset + this._X
+                let y1 = Math.cos(deg * i) * arr[i] / offset + this._Y
+                // str += `${x1},${y1} `
+                this.ctx.lineTo(x1, y1)
+                this.ctx.lineTo(this._X, this._Y)
+            }
+        }
+        this.ctx.stroke()
+    }
+
 }
+
+export default CanvasDrawer

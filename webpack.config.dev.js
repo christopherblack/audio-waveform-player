@@ -2,16 +2,21 @@ const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
 module.exports = {
     mode: 'development',
     entry: {
-        'main': './src/js/main.js'
+        'player': './src/js/index.js'
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'js/bundle.js'
+        filename: "[name].bundle.js"
     },
     plugins: [
+        new MiniCssExtractPlugin({
+            filename: "[name].bundle.css"
+        }),
         new HtmlWebpackPlugin({
             filename: 'index.html',
             template: 'src/index.html',
@@ -32,8 +37,23 @@ module.exports = {
                 use: 'babel-loader'
             },
             {
+                test: /\.scss$/,
+                use: [
+                    'style-loader',
+                    'css-loader',
+                    'postcss-loader',
+                    'sass-loader'
+                ]
+            },
+            {
                 test: /\.(png|woff|woff2|eot|ttf|svg)$/,
-                use: 'url-loader?limit=100000'
+                use: {
+                    loader: 'url-loader',
+                    options: {
+                        limit: 8192,
+                        name: '[path][name].[ext]?[hash]'
+                    }
+                }
             }
         ]
     },
