@@ -11,12 +11,12 @@
   }
   &.paused {
     .player-button {
-      background-image: url('../assets/play.svg');
+      background-image: url('../assets/play-arrow.svg');
     }
   }
   &.playing {
     .player-button {
-      background-image: url('../assets/pause.svg');
+      background-image: url('../assets/pause-button.svg');
     }
   }
 }

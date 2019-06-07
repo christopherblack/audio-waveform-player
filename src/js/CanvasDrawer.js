@@ -73,8 +73,8 @@ class CanvasDrawer {
     }
 
     drawCircular(arr) {
-        const length = arr.length
-        const deg = 360 / length
+        const length = arr.length * .8
+        const deg = (360 * Math.PI /180) / length
         const offset = 256 / this._WIDTH * 2
 
         this.ctx.clearRect(0, 0, this._WIDTH, this._HEIGHT) // clear canvas
@@ -93,9 +93,12 @@ class CanvasDrawer {
                 // str += `${x1},${y1} `
                 this.ctx.lineTo(x1, y1)
                 this.ctx.lineTo(this._X, this._Y)
+
             }
         }
+
         this.ctx.stroke()
+
     }
 
 }

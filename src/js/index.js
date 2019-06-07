@@ -11,5 +11,5 @@ new WaveformAudioPlayer({
     stroke: '#9c1441',
     fill: '#1abccc',
     background: '#ccc',
-    quality: 5
+    quality: 8
 })
